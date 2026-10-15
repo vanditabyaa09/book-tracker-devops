@@ -1,0 +1,26 @@
+gitignore
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets / env
+.env
+*.env
+
+# Node
+node_modules/
+frontend/dist/
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+crash.log
+
+# OS / personal
+.DS_Store
+CAPSTONE_GUIDE.md
