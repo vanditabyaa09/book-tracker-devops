@@ -1,4 +1,4 @@
 region             = "ap-south-1"
 project_name       = "book-tracker"
 cluster_version    = "1.36"   # from aws eks describe-cluster-versions
-node_instance_type = "t3.large"
+node_instance_type = "m7i-flex.large"
