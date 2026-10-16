@@ -1,0 +1,25 @@
+imageTag: "replace-with-a-real-commit-sha"
+imageRegistry: ghcr.io/vanditabyaa09
+imagePullPolicy: IfNotPresent
+
+backend:
+  image: book-tracker-backend
+  replicas: 2
+
+frontend:
+  image: book-tracker-frontend
+  replicas: 2
+
+postgres:
+  image: postgres:17-alpine
+  database: books
+  user: books
+  password: books   # demo only, see README "Known limitations"
+
+ingress:
+  enabled: true
+  className: nginx
+  host: ""          # empty = match any host (works with the raw ELB hostname / localhost)
+
+serviceMonitor:
+  enabled: true
