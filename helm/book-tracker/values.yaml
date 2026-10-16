@@ -1,4 +1,4 @@
-imageTag: "4099bd250d5d1b8735aa0ca4eab9ed0d9ba52b90"
+imageTag: "5c1d4d3ea7ef309abed84d5393e3b93e2c1df31a"
 imageRegistry: ghcr.io/vanditabyaa09
 imagePullPolicy: IfNotPresent
 
