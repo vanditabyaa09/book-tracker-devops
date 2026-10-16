@@ -55,7 +55,7 @@ flowchart LR
     subgraph AWS["AWS ap-south-1 (provisioned by Terraform)"]
       subgraph VPC["VPC 10.0.0.0/16 · 2 AZs"]
         elb[AWS ELB] --> ing[ingress-nginx]
-        subgraph EKS["EKS 1.36 · 2× t3.large nodes (private subnets)"]
+        subgraph EKS["EKS 1.36 · 2× m7i-flex.large nodes (private subnets)"]
           ing -- "/" --> fe[frontend ×2<br/>nginx + React]
           ing -- "/api" --> be[backend ×2<br/>FastAPI]
           fe -- "/api proxy" --> be
@@ -314,14 +314,14 @@ All AWS infrastructure is created from [`terraform/`](terraform/). Nothing is cl
 | `outputs.tf` | cluster name, VPC id, ready-to-run `aws eks update-kubeconfig` command |
 | `terraform.tfvars.example` | template for your own `terraform.tfvars`. **No credentials, ever** |
 
-**What gets created (~66 resources):**
+**What gets created (54 resources, per `terraform plan`):**
 - **VPC** `10.0.0.0/16` across **2 availability zones**
   - **2 public subnets** (`10.0.1.0/24`, `10.0.2.0/24`), tagged `kubernetes.io/role/elb` so AWS places internet-facing load balancers there
   - **2 private subnets** (`10.0.11.0/24`, `10.0.12.0/24`) for the worker nodes
   - Internet gateway, **one NAT gateway** (so private nodes can pull images), and route tables
 - **EKS cluster** `book-tracker-eks`, Kubernetes **1.36**, public API endpoint, with the creating IAM identity granted cluster-admin
   through an EKS access entry
-- **Managed node group:** **2 × `t3.large`** (min 2 / max 3), Amazon Linux 2023, one node per AZ. `t3.large` was chosen
+- **Managed node group:** **2 × `m7i-flex.large`** (2 vCPU, 8 GiB; min 2 / max 3), Amazon Linux 2023, one node per AZ. This size was chosen
   because EKS limits pods per node by instance size, and `t3.medium` (~17 pods) would overflow once monitoring and ArgoCD are added.
 
 **Usage**
@@ -337,6 +337,17 @@ kubectl get nodes
 
 Credentials come from the AWS CLI profile (`~/.aws/credentials`) and are never stored in the repo. State is kept
 locally and git-ignored.
+
+**`terraform plan`:** 54 resources to add, 0 to change, 0 to destroy:
+
+![terraform plan](docs/screenshots/19a-terraform-plan-summary.png)
+
+<details><summary>Plan excerpt: VPC, public/private subnet and NAT gateway attributes</summary>
+
+![terraform plan vpc detail](docs/screenshots/19b-terraform-plan-vpc-detail.png)
+</details>
+
+**`terraform apply`:**
 
 ![terraform apply](docs/screenshots/18-terraform-apply.png)
 
@@ -500,6 +511,7 @@ every remaining resource, and an audit of the region confirmed nothing billable 
 | Demo DB password is in `values.yaml` (rendered into a K8s Secret) | External Secrets Operator + AWS Secrets Manager, or Sealed Secrets |
 | Terraform state is local (git-ignored) | S3 backend with state locking |
 | HTTP only, no TLS on the load balancer | cert-manager + Let's Encrypt, or an ACM certificate |
+| The AWS account is on the **Free plan**, which only allows a short list of instance types. The first apply with `t3.large` hung because every `RunInstances` call was rejected (`not eligible for Free Tier`, visible in CloudTrail). Nodes now use Free-plan-eligible **`m7i-flex.large`** | A paid-plan account, which allows any instance type and Spot/Graviton node groups |
 | Single NAT gateway (one AZ is a single point of failure for egress) | One NAT gateway per AZ |
 | `AdministratorAccess` IAM user used for provisioning | Least-privilege IAM policy / role assumed via SSO or OIDC |
 | ingress-nginx is in upstream retirement (still works) | Gateway API (e.g. AWS Load Balancer Controller / Envoy Gateway) |
@@ -525,5 +537,6 @@ every remaining resource, and an audit of the region confirmed nothing billable 
 | 16 | [Prometheus targets UP](docs/screenshots/16-prometheus-targets.png) | M9 |
 | 17 | [Grafana dashboard](docs/screenshots/17-grafana-dashboard.png) | M9 |
 | 18 | [`terraform apply`](docs/screenshots/18-terraform-apply.png) | M7 |
+| 19a–b | [`terraform plan` summary](docs/screenshots/19a-terraform-plan-summary.png) · [VPC detail](docs/screenshots/19b-terraform-plan-vpc-detail.png) | M7 |
 | 22 | [`terraform destroy` complete](docs/screenshots/22-terraform-destroy.png) | M7 |
 | 23 | [AWS region clean after teardown](docs/screenshots/23-aws-clean-after-destroy.png) | M7 |
