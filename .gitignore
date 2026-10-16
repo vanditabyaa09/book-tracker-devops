@@ -1,4 +1,3 @@
-gitignore
 # Python
 __pycache__/
 *.py[cod]
@@ -20,6 +19,9 @@ frontend/dist/
 *.tfstate.*
 terraform.tfvars
 crash.log
+tfplan
+*.tfplan
+.terraform.tfstate.lock.info
 
 # OS / personal
 .DS_Store

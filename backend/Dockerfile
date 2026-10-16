@@ -8,8 +8,10 @@ WORKDIR /app
 RUN useradd --create-home --uid 10001 appuser
 
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip \
- && pip install --no-cache-dir -r requirements.txt
+# pip is removed after installing: it isn't needed at runtime and its vendored
+# libraries (urllib3, msgpack, setuptools) carry HIGH CVEs flagged by Trivy.
+RUN pip install --no-cache-dir -r requirements.txt \
+ && pip uninstall -y pip
 
 COPY . .
 
