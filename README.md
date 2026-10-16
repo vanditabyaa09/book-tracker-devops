@@ -481,9 +481,16 @@ kubectl delete namespace argocd book-tracker monitoring ingress-nginx --ignore-n
 cd terraform && terraform destroy
 ```
 
-<!-- Destroy evidence (add after teardown):
+**Teardown evidence:** after the ELB was removed (Helm uninstall + namespace deletion), `terraform destroy` removed
+every remaining resource, and an audit of the region confirmed nothing billable was left.
+
 ![terraform destroy](docs/screenshots/22-terraform-destroy.png)
--->
+
+![AWS account clean after destroy](docs/screenshots/23-aws-clean-after-destroy.png)
+
+> A transient DNS failure on the workstation interrupted the first `destroy` run while it was waiting on the EKS
+> cluster deletion. Because Terraform tracks progress in state, re-running `terraform destroy` simply removed the
+> remaining 21 resources. This is the same idempotent behaviour that lets an interrupted `apply` be resumed.
 
 ## 14. Known issues and limitations
 
@@ -518,3 +525,5 @@ cd terraform && terraform destroy
 | 16 | [Prometheus targets UP](docs/screenshots/16-prometheus-targets.png) | M9 |
 | 17 | [Grafana dashboard](docs/screenshots/17-grafana-dashboard.png) | M9 |
 | 18 | [`terraform apply`](docs/screenshots/18-terraform-apply.png) | M7 |
+| 22 | [`terraform destroy` complete](docs/screenshots/22-terraform-destroy.png) | M7 |
+| 23 | [AWS region clean after teardown](docs/screenshots/23-aws-clean-after-destroy.png) | M7 |
