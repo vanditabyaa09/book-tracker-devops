@@ -1,4 +1,4 @@
-imageTag: "replace-with-a-real-commit-sha"
+imageTag: "9bc825a21870d665bfca1890b4b7dfca6d3fc3c7"
 imageRegistry: ghcr.io/vanditabyaa09
 imagePullPolicy: IfNotPresent
 
