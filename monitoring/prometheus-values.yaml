@@ -1,0 +1,8 @@
+prometheus:
+  prometheusSpec:
+    # Pick up ServiceMonitors from ALL namespaces/releases, not only ones labelled for this Helm release
+    serviceMonitorSelectorNilUsesHelmValues: false
+    podMonitorSelectorNilUsesHelmValues: false
+    retention: 2d
+alertmanager:
+  enabled: false
