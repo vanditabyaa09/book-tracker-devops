@@ -390,7 +390,7 @@ kubectl get pods,svc,ingress -n book-tracker
 kubectl get svc -n ingress-nginx ingress-nginx-controller   # EXTERNAL-IP = public URL
 ```
 
-**Running on EKS:** 2 backend + 2 frontend replicas spread across both nodes and AZs, all `Running`. The 2 restarts on each
+**Running on EKS:** 2 backend + 2 frontend replicas spread across both nodes and AZs, all `Running`. The restart on each
 backend pod happened while Postgres was still starting; the container exits if migrations can't connect, and
 Kubernetes restarts it until the DB is ready.
 
@@ -425,9 +425,13 @@ Git. ArgoCD **pulls** the desired state from Git and continuously reconciles the
 manual drift (for example a `kubectl edit`), and `prune` removes resources deleted from the chart. Rolling back means
 reverting a commit.
 
-<!-- ArgoCD evidence (add before submission):
-![ArgoCD synced](docs/screenshots/21-argocd-synced.png)
--->
+**ArgoCD v3.5.5 on EKS: `book-tracker` is Healthy and Synced** to `main` at the commit made by the pipeline's
+`update-helm-values` job (`ci: deploy images 5c1d4d3 [skip ci]`). That is the GitOps loop working end to end, from a push
+to CI, to a new image in GHCR, to the tag committed in Git, to ArgoCD rolling the cluster forward.
+
+![ArgoCD application synced and healthy](docs/screenshots/21-argocd-synced.png)
+
+![ArgoCD applications view](docs/screenshots/21b-argocd-applications.png)
 
 ## 12. Observability: Prometheus and Grafana
 
@@ -537,6 +541,7 @@ every remaining resource, and an audit of the region confirmed nothing billable 
 | 16 | [Prometheus targets UP](docs/screenshots/16-prometheus-targets.png) | M9 |
 | 17 | [Grafana dashboard](docs/screenshots/17-grafana-dashboard.png) | M9 |
 | 18 | [`terraform apply`](docs/screenshots/18-terraform-apply.png) | M7 |
+| 21 | [ArgoCD Synced/Healthy](docs/screenshots/21-argocd-synced.png) · [applications](docs/screenshots/21b-argocd-applications.png) | GitOps (video) |
 | 19a–b | [`terraform plan` summary](docs/screenshots/19a-terraform-plan-summary.png) · [VPC detail](docs/screenshots/19b-terraform-plan-vpc-detail.png) | M7 |
 | 22 | [`terraform destroy` complete](docs/screenshots/22-terraform-destroy.png) | M7 |
 | 23 | [AWS region clean after teardown](docs/screenshots/23-aws-clean-after-destroy.png) | M7 |
