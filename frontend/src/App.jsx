@@ -54,7 +54,7 @@ export default function App() {
 
   return (
     <main className="container">
-      <h1>📚 Book Tracker</h1>
+      <h1>📚 Book Tracker v2</h1>
       <form className="card form" onSubmit={addBook}>
         <input placeholder="Title" required value={form.title} onChange={set('title')} />
         <input placeholder="Author" required value={form.author} onChange={set('author')} />
